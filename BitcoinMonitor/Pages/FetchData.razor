@@ -1,0 +1,49 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using BitcoinMonitor.Data
+@using BitcoinMonitor.Domain.Models
+@inject ExchangeRateService ExchangeRateService
+
+<h1>Exchange rates</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (rates == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>DateTime</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rate in rates)
+            {
+                <tr>
+                    <td>@rate.Time.ToLocalTime()</td>
+                    <td>@rate.BaseCurrency</td>
+                    <td>@rate.TargetCurrency</td>
+                    <td>@rate.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private ExchangeRate[]? rates;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rates = await ExchangeRateService.GetExchangeRatesAsync();
+    }
+}
