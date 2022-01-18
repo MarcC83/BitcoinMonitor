@@ -1,4 +1,7 @@
 using BitcoinMonitor.Data;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using Infrastructure.CoinbaseExchangeProvider;
 using Infrastructure.CoinbaseExchangeProvider.AutoMapperProfile;
 using Microsoft.AspNetCore.Components;
@@ -20,6 +23,13 @@ builder.Services.AddDbContext<BitcoinMonitorContext>(
                 {
                     options.UseInMemoryDatabase("ApplicationDatabase");
                 });
+
+builder.Services.AddBlazorise(options =>
+              {
+                  options.ChangeTextOnKeyPress = true;
+              })
+            .AddBootstrapProviders()
+            .AddFontAwesomeIcons();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

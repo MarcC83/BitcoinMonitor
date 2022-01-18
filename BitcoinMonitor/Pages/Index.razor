@@ -1,5 +1,10 @@
 ﻿@page "/"
 
+@using BitcoinMonitor.Data
+@using BitcoinMonitor.Domain.Models
+@using Blazorise.Charts
+@inject ExchangeRateService ExchangeRateService
+
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
@@ -7,3 +12,52 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+<LineChart @ref="lineChart" TItem="double" />
+
+@code{
+    LineChart<double> lineChart;
+    ExchangeRate[] exchangeRates;
+
+    protected override async Task OnAfterRenderAsync( bool firstRender )
+    {
+        if ( firstRender )
+        {
+            await HandleRedraw();
+        }
+    }
+
+    async Task HandleRedraw()
+    {
+        await lineChart.Clear();
+
+        exchangeRates = await ExchangeRateService.GetExchangeRatesAsync();
+        Labels = GetLabels();
+        await lineChart.AddLabelsDatasetsAndUpdate( Labels, GetLineChartDataset() );
+    }
+
+    string[] GetLabels()
+    {
+        return exchangeRates.Select(r => r.Time).ToList().ConvertAll(t => t.ToLocalTime().ToString()).ToArray();
+    }
+
+    LineChartDataset<double> GetLineChartDataset()
+    {
+        var firstValue = exchangeRates.First();
+
+        return new LineChartDataset<double>
+        {
+            Label = $"{firstValue.BaseCurrency}-{firstValue.TargetCurrency} price",
+            Data = exchangeRates.Select(r => r.Price).ToList().ConvertAll(d => (double)d),
+            BackgroundColor = backgroundColors,
+            BorderColor = borderColors,
+            Fill = false,
+            PointRadius = 2,
+            BorderDash = new List<int> { }
+        };
+    }
+
+    string[] Labels = null;
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 0.2f ), ChartColor.FromRgba( 54, 162, 235, 0.2f ), ChartColor.FromRgba( 255, 206, 86, 0.2f ), ChartColor.FromRgba( 75, 192, 192, 0.2f ), ChartColor.FromRgba( 153, 102, 255, 0.2f ), ChartColor.FromRgba( 255, 159, 64, 0.2f ) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 1f ), ChartColor.FromRgba( 54, 162, 235, 1f ), ChartColor.FromRgba( 255, 206, 86, 1f ), ChartColor.FromRgba( 75, 192, 192, 1f ), ChartColor.FromRgba( 153, 102, 255, 1f ), ChartColor.FromRgba( 255, 159, 64, 1f ) };
+
+}
