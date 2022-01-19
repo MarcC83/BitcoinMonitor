@@ -1,4 +1,5 @@
 using BitcoinMonitor.Data;
+using BitcoinMonitor.Domain.Interfaces.CurrenciesExchange;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
@@ -15,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAutoMapper(typeof(CoinbaseAutoMapperProfile).Assembly);
 
 //Add exchange rate provider
-builder.Services.CoinbaseExchangeProvider("https://api.coinbase.com");
+builder.Services.AddScoped<IExchangeRateProvider, CoinbaseExchangeRateProvider>();
 
 //Adding database context
 builder.Services.AddDbContext<BitcoinMonitorContext>(

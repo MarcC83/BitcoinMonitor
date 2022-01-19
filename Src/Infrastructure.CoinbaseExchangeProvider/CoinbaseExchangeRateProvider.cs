@@ -3,22 +3,23 @@ using BitcoinMonitor.Domain.Interfaces.CurrenciesExchange;
 using BitcoinMonitor.Domain.Models;
 using Infrastructure.CoinbaseExchangeProvider.Interface;
 using Microsoft.Extensions.Logging;
+using Refit;
 
 namespace Infrastructure.CoinbaseExchangeProvider
 {
-    public class CoinbaseEchangeRateProvider : IExchangeRateProvider
+    public class CoinbaseExchangeRateProvider : IExchangeRateProvider
     {
-        private readonly ILogger<CoinbaseEchangeRateProvider> _logger;
+        private readonly ILogger<CoinbaseExchangeRateProvider> _logger;
         private readonly IMapper _mapper;
         private readonly ICoinbaseEchangeRateProvider _coinbaseRefitClient;
         private readonly Random _randomGenerator;
 
-        public CoinbaseEchangeRateProvider(ILogger<CoinbaseEchangeRateProvider> logger,IMapper mapper, ICoinbaseEchangeRateProvider coinbaseRefitClient)
+        public CoinbaseExchangeRateProvider(ILogger<CoinbaseExchangeRateProvider> logger,IMapper mapper)
         {
             _logger = logger;
             _mapper = mapper;
-            _coinbaseRefitClient = coinbaseRefitClient;
             _randomGenerator = new Random();
+            _coinbaseRefitClient = RestService.For<ICoinbaseEchangeRateProvider>("https://api.coinbase.com");
         }
 
         public async Task<ExchangeRate> GetCurrentExchangeRate(string baseCurrency, string targetCurrency)
