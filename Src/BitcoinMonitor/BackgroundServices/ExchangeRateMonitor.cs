@@ -1,19 +1,25 @@
 ﻿using BitcoinMonitor.Data;
 using BitcoinMonitor.Domain.Interfaces.CurrenciesExchange;
 using BitcoinMonitor.Domain.Models;
+using System.Reactive.Subjects;
 
 namespace BitcoinMonitor.BackgroundServices
 {
-    public class EchangeRateMonitor : BackgroundService
+    public class ExchangeRateMonitor : BackgroundService
     {
-        private readonly ILogger<EchangeRateMonitor> _logger;
+        private readonly ILogger<ExchangeRateMonitor> _logger;
         private readonly IServiceProvider _serviceProvided;
         private readonly PeriodicTimer _periodicTimer;
-        public EchangeRateMonitor(ILogger<EchangeRateMonitor> logger, IServiceProvider serviceProvided)
+        private BehaviorSubject<ExchangeRate?> _currentExchangeRate;
+
+        public IObservable<ExchangeRate?> CurrentExchangeRate => _currentExchangeRate;
+
+        public ExchangeRateMonitor(ILogger<ExchangeRateMonitor> logger, IServiceProvider serviceProvided)
         {
             _logger = logger;
             _serviceProvided = serviceProvided;
             _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            _currentExchangeRate = new BehaviorSubject<ExchangeRate?>(default);
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -27,11 +33,9 @@ namespace BitcoinMonitor.BackgroundServices
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-           
-            
             while (!stoppingToken.IsCancellationRequested)
             {
-                await GetExchangeRate();
+                _currentExchangeRate.OnNext(await GetExchangeRate());
                 await _periodicTimer.WaitForNextTickAsync(stoppingToken);
             }
         }

@@ -1,0 +1,112 @@
+﻿@page "/"
+
+@using BitcoinMonitor.Data
+@using BitcoinMonitor.Domain.Models
+@using BitcoinMonitor.Interfaces.Hubs
+@using Blazorise.Charts
+@using Microsoft.AspNetCore.SignalR.Client
+@inject ExchangeRateService ExchangeRateService
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> logger
+
+<PageTitle>Bitcoin Monitor live tracker</PageTitle>
+
+<h1>Welcome!</h1>
+
+<h2>Please read me!</h2>
+<p>Welcome to Bitcoin monitor, in times where bitcoin price changes every 5 seconds it is important ot keep track of it in a live view.</p>
+
+<p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is add reteived value 
+    with maximum value being 10% of the retreived value to make variations happen in so short time lap</p>
+<p>Values retrieve from the coin base api are stored in a in memory database using EF core</p>
+<LineChart @ref="lineChart" TItem="double" />
+
+@code{
+    private HubConnection? hubConnection;
+    LineChart<double>? lineChart;
+    static private List<ExchangeRate>? exchangeRates;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/exchangerateupdatehub"))
+            .Build();
+
+        hubConnection.On<ExchangeRate>(nameof(IExchangeRateHub.CurrentExchangeRate), async (newRate) =>
+        {
+            logger.LogDebug("Received new rate");
+            await AddRate(newRate);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync( bool firstRender )
+    {
+        if ( firstRender )
+        {
+            await HandleRedraw();
+        }
+    }
+
+    async Task HandleRedraw()
+    {
+        if (lineChart is not null)
+        {
+            await lineChart.Clear();
+            exchangeRates = new (await ExchangeRateService.GetExchangeRatesAsync());
+            Labels = GetLabels();
+            await lineChart.AddLabelsDatasetsAndUpdate(Labels, GetLineChartDataset());
+        }
+    }
+
+    async Task AddRate(ExchangeRate newRate)
+    {
+        //exchangeRates is assigned when the graph is render the first time, here graph updates are 
+        //skept until the graph is create the first time
+        if (exchangeRates is not null)
+        {
+            if (lineChart is not null)
+            {
+                await lineChart.AddLabels(newRate.Time.ToLocalTime().ToString());
+                await lineChart.AddData(0,(double)newRate.Price);
+                await lineChart.Update();
+            }
+            exchangeRates.Add(newRate);
+        }
+
+    }
+
+    string[] GetLabels()
+    {
+        if(exchangeRates is not null)
+            return exchangeRates.Select(r => r.Time).ToList().ConvertAll(t => t.ToLocalTime().ToString()).ToArray();
+        return new string[0];
+    }
+
+    LineChartDataset<double> GetLineChartDataset()
+    {
+        if (exchangeRates is not null)
+        {
+            var firstValue = exchangeRates.First();
+            return new LineChartDataset<double>
+            {
+                Label = $"{firstValue.BaseCurrency}-{firstValue.TargetCurrency} price",
+                Data = exchangeRates.Select(r => r.Price).ToList().ConvertAll(d => (double)d),
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                Fill = false,
+                PointRadius = 2,
+                BorderDash = new List<int> { }
+            }; 
+        }
+
+        logger.LogError("{VariableName} was null", exchangeRates);
+        return new LineChartDataset<double>();
+    }
+
+    string[] Labels = new string[0];
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 0.2f ), ChartColor.FromRgba( 54, 162, 235, 0.2f ), ChartColor.FromRgba( 255, 206, 86, 0.2f ), ChartColor.FromRgba( 75, 192, 192, 0.2f ), ChartColor.FromRgba( 153, 102, 255, 0.2f ), ChartColor.FromRgba( 255, 159, 64, 0.2f ) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 1f ), ChartColor.FromRgba( 54, 162, 235, 1f ), ChartColor.FromRgba( 255, 206, 86, 1f ), ChartColor.FromRgba( 75, 192, 192, 1f ), ChartColor.FromRgba( 153, 102, 255, 1f ), ChartColor.FromRgba( 255, 159, 64, 1f ) };
+
+}

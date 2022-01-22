@@ -1,16 +1,21 @@
+using BitcoinMonitor.BackgroundServices;
 using BitcoinMonitor.Data;
 using BitcoinMonitor.Domain.Interfaces.CurrenciesExchange;
+using BitcoinMonitor.Hubs;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Infrastructure.CoinbaseExchangeProvider;
 using Infrastructure.CoinbaseExchangeProvider.AutoMapperProfile;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Refit;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Add Serilog for logging instead of default logger
+builder.Host.UseSerilog((context, loggerConfiguration) => 
+    loggerConfiguration.WriteTo.Console());
 
 //Add automapper profiles
 builder.Services.AddAutoMapper(typeof(CoinbaseAutoMapperProfile).Assembly);
@@ -35,12 +40,17 @@ builder.Services.AddBlazorise(options =>
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 
 builder.Services.AddScoped<ExchangeRateService>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddHostedService<BitcoinMonitor.BackgroundServices.EchangeRateMonitor>();
+builder.Services.AddSingleton<ExchangeRateMonitor>();
+builder.Services.AddHostedService<ExchangeRateMonitor>((s) => s.GetRequiredService<ExchangeRateMonitor>());
 
 var app = builder.Build();
 
@@ -50,12 +60,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.MapBlazorHub();
+app.MapHub<ExchangeRateUpdateHub>("/exchangerateupdatehub");
 app.MapFallbackToPage("/_Host");
 
 app.Run();

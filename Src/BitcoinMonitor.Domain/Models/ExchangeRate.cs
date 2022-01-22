@@ -10,6 +10,6 @@ namespace BitcoinMonitor.Domain.Models
         public DateTime Time { get; set; }
         public string? BaseCurrency { get; set; }
         public string? TargetCurrency { get; set; }
-        public double? Price { get; set; }
+        public double Price { get; set; }
     }
 }
