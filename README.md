@@ -26,6 +26,6 @@ Use the following command to pull the image from docker hub and run it
 ***docker run -p 80:80 marcclapera/bitcoinmonitor:0.7***
 
 ## Test
-To run the unit test, use the command from the cloned repositor root directory
+To run the unit test, use the command from the cloned repositor root directory  
 ***dotnet test***
 
