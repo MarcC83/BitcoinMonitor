@@ -18,9 +18,9 @@
 <h2>Please read me!</h2>
 <p>Welcome to Bitcoin monitor, in times where bitcoin price changes every @exchangeRateConfiguration.SamplingInterval.TotalSeconds.ToString() seconds it is important to keep track of it in a live view.</p>
 
-<p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is added to the reteived value, 
-    noise value can be at maximum @exchangeRateConfiguration.NoiseLevel% of the retreived value</p>
-<p>Values retrieve from the coin base api are stored in a in memory database when running on localhost or MsSql databbase for the Azure version using EF core</p>
+<p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is added to the retrieved value. 
+    Noise value can be at maximum @exchangeRateConfiguration.NoiseLevel% of the retreived value</p>
+<p>Values retrieved from the Coinbase API are stored in an in memory database when running on localhost or MsSql database for the Azure version using EF core</p>
 <div class="container">
   <div class="row text-center">
     <div class="col-3">
@@ -144,7 +144,7 @@
             }; 
         }
 
-        logger.LogError("{VariableName} was null", exchangeRates);
+        logger.LogError("{VariableName} was null or had no values", exchangeRates);
         return new LineChartDataset<double>();
     }
 
