@@ -1,6 +1,7 @@
 ﻿using BitcoinMonitor.Data;
 using BitcoinMonitor.Domain.Interfaces.CurrenciesExchange;
 using BitcoinMonitor.Domain.Models;
+using BitcoinMonitor.Domain.Models.Configuration;
 using System.Reactive.Subjects;
 
 namespace BitcoinMonitor.BackgroundServices
@@ -9,16 +10,18 @@ namespace BitcoinMonitor.BackgroundServices
     {
         private readonly ILogger<ExchangeRateMonitor> _logger;
         private readonly IServiceProvider _serviceProvided;
+        private readonly ExchangeRateProviderConfiguration _configuration;
         private readonly PeriodicTimer _periodicTimer;
         private BehaviorSubject<ExchangeRate?> _currentExchangeRate;
 
         public IObservable<ExchangeRate?> CurrentExchangeRate => _currentExchangeRate;
 
-        public ExchangeRateMonitor(ILogger<ExchangeRateMonitor> logger, IServiceProvider serviceProvided)
+        public ExchangeRateMonitor(ILogger<ExchangeRateMonitor> logger, IServiceProvider serviceProvided, ExchangeRateProviderConfiguration configuration)
         {
             _logger = logger;
             _serviceProvided = serviceProvided;
-            _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            _configuration = configuration;
+            _periodicTimer = new PeriodicTimer(_configuration.SamplingInterval);
             _currentExchangeRate = new BehaviorSubject<ExchangeRate?>(default);
         }
 

@@ -2,23 +2,25 @@
 
 @using BitcoinMonitor.Data
 @using BitcoinMonitor.Domain.Models
+@using BitcoinMonitor.Domain.Models.Configuration
 @using BitcoinMonitor.Interfaces.Hubs
 @using Blazorise.Charts
 @using Microsoft.AspNetCore.SignalR.Client
 @inject ExchangeRateService ExchangeRateService
 @inject NavigationManager NavigationManager
 @inject ILogger<Index> logger
+@inject ExchangeRateProviderConfiguration exchangeRateConfiguration  
 
 <PageTitle>Bitcoin Monitor live tracker</PageTitle>
 
 <h1>Welcome!</h1>
 
 <h2>Please read me!</h2>
-<p>Welcome to Bitcoin monitor, in times where bitcoin price changes every 5 seconds it is important ot keep track of it in a live view.</p>
+<p>Welcome to Bitcoin monitor, in times where bitcoin price changes every @exchangeRateConfiguration.SamplingInterval.TotalSeconds.ToString() seconds it is important to keep track of it in a live view.</p>
 
-<p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is add reteived value 
-    with maximum value being 10% of the retreived value to make variations happen in so short time lap</p>
-<p>Values retrieve from the coin base api are stored in a in memory database using EF core</p>
+<p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is added to the reteived value, 
+    noise value can be at maximum @exchangeRateConfiguration.NoiseLevel% of the retreived value</p>
+<p>Values retrieve from the coin base api are stored in a in memory database when running on localhost or MsSql databbase for the Azure version using EF core</p>
 <LineChart @ref="lineChart" TItem="double" />
 
 @code{

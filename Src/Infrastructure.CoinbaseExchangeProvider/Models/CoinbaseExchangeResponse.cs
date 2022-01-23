@@ -6,7 +6,7 @@ namespace Infrastructure.CoinbaseExchangeProvider.Models
     public record CoinbaseExchangeResponse
     {
         [JsonPropertyName("data")]
-        public CoinbaseExchangeRate Data { get; set; }
+        public CoinbaseExchangeRate? Data { get; set; }
     }
 
     public record CoinbaseExchangeRate
@@ -18,6 +18,6 @@ namespace Infrastructure.CoinbaseExchangeProvider.Models
         public string? TargetCurrency { get; set; }
 
         [JsonPropertyName("amount")]
-        public string Price { get; set; }
+        public string? Price { get; set; }
     }
 }
