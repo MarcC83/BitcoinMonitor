@@ -18,6 +18,6 @@ namespace Infrastructure.CoinbaseExchangeProvider.Models
         public string? TargetCurrency { get; set; }
 
         [JsonPropertyName("amount")]
-        public string? Price { get; set; }
+        public string Price { get; set; } = "0";
     }
 }

@@ -24,14 +24,7 @@
 <div class="container">
   <div class="row text-center">
     <div class="col-3">
-      @if(exchangeRates is not null && exchangeRates.Last() is not null)
-            {
-                <h2>Currnent price: @exchangeRates.Last().Price.ToString("F2") €</h2>
-            }
-            else
-            {
-                <h2>Loading</h2>
-            }
+      @currentPrice
     </div>
     <div class="col-3">
       <button type="button" @onclick="() => SetTime(TimeSpan.FromHours(1))" class="btn btn-primary">1 Hour</button>
@@ -50,6 +43,7 @@
     LineChart<double>? lineChart;
     static private List<ExchangeRate>? exchangeRates;
     static private bool isGraphDrawn = false;
+    string currentPrice = "Loading";
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,6 +65,7 @@
         if ( firstRender )
         {
             exchangeRates = new (await ExchangeRateService.GetExchangeRatesAsync(DateTime.UtcNow - maxTimeForData));
+            SetCurrentPrice(exchangeRates.Last().Price);
             await HandleRedraw();
         }
     }
@@ -88,8 +83,11 @@
 
     IEnumerable<ExchangeRate> GetExchangeRatesFilterByTime()
     {
-        return exchangeRates.Where(r => r.Time > DateTime.UtcNow - maxTimeForData);
+        if(exchangeRates is not null)
+            return exchangeRates.Where(r => r.Time > DateTime.UtcNow - maxTimeForData);
+        return new ExchangeRate[0];
     }
+
     async Task AddRate(ExchangeRate newRate)
     {
         //exchangeRates is assigned when the graph is render the first time, here graph updates are 
@@ -103,8 +101,16 @@
                 await lineChart.Update();
             }
             exchangeRates.Add(newRate);
+            SetCurrentPrice(newRate.Price);
         }
     }
+
+    void SetCurrentPrice(double price)
+    {
+        currentPrice = $"Current price: {price:0.##} €";
+        StateHasChanged();
+    }
+
 
     string[] GetLabels()
     {
