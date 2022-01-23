@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitcoinMonitor", "Src\BitcoinMonitor\BitcoinMonitor.csproj", "{F1E12116-6159-462B-A9B1-10EA3A7325FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitcoinMonitor", "Src\BitcoinMonitor\BitcoinMonitor.csproj", "{F1E12116-6159-462B-A9B1-10EA3A7325FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitcoinMonitor.Domain", "Src\BitcoinMonitor.Domain\BitcoinMonitor.Domain.csproj", "{A42398BF-F55F-4717-94B1-C4D99754FB09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitcoinMonitor.Domain", "Src\BitcoinMonitor.Domain\BitcoinMonitor.Domain.csproj", "{A42398BF-F55F-4717-94B1-C4D99754FB09}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4AF9819C-8A18-487E-BCA7-C366465CEA18}"
 EndProject
@@ -13,11 +13,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{4AF65117-7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{5E6EA3DD-FF4B-485E-BA52-AB7EA2174DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.CoinbaseExchangeProvider", "Src\Infrastructure.CoinbaseExchangeProvider\Infrastructure.CoinbaseExchangeProvider.csproj", "{CFC9F027-31AD-4A3F-A505-3EC0F290CFAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.CoinbaseExchangeProvider", "Src\Infrastructure.CoinbaseExchangeProvider\Infrastructure.CoinbaseExchangeProvider.csproj", "{CFC9F027-31AD-4A3F-A505-3EC0F290CFAB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{B3CB72C9-FA4E-4DBB-B58D-35787FEB397C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitcoinMonitor.Data", "Src\BitcoinMonitor.Data\BitcoinMonitor.Data.csproj", "{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitcoinMonitor.Data", "Src\BitcoinMonitor.Data\BitcoinMonitor.Data.csproj", "{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2A227059-FCE0-482F-B97A-18D696581D45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.BitcoinMonitor", "Tests\Test.BitcoinMonitor\Test.BitcoinMonitor.csproj", "{F48786C5-77E8-4059-9381-73033A6B6C44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,10 @@ Global
 		{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F48786C5-77E8-4059-9381-73033A6B6C44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F48786C5-77E8-4059-9381-73033A6B6C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F48786C5-77E8-4059-9381-73033A6B6C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F48786C5-77E8-4059-9381-73033A6B6C44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +58,7 @@ Global
 		{A42398BF-F55F-4717-94B1-C4D99754FB09} = {4AF9819C-8A18-487E-BCA7-C366465CEA18}
 		{CFC9F027-31AD-4A3F-A505-3EC0F290CFAB} = {5E6EA3DD-FF4B-485E-BA52-AB7EA2174DC6}
 		{5A6C2AB8-D6B9-4C5B-97ED-C55FE924276B} = {4AF65117-7E37-4925-9EC5-5E0181C629D5}
+		{F48786C5-77E8-4059-9381-73033A6B6C44} = {2A227059-FCE0-482F-B97A-18D696581D45}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C08860FE-B4EE-4684-97B0-47F9EC162321}
