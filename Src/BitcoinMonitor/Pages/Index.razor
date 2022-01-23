@@ -41,8 +41,8 @@
 @code{
     private HubConnection? hubConnection;
     LineChart<double>? lineChart;
-    static private List<ExchangeRate>? exchangeRates;
-    static private bool isGraphDrawn = false;
+    private List<ExchangeRate>? exchangeRates;
+    private bool isGraphDrawn = false;
     string currentPrice = "Loading";
 
     protected override async Task OnInitializedAsync()
@@ -64,9 +64,10 @@
     {
         if ( firstRender )
         {
-            exchangeRates = new (await ExchangeRateService.GetExchangeRatesAsync(DateTime.UtcNow - maxTimeForData));
+            exchangeRates = (await ExchangeRateService.GetExchangeRatesAsync(DateTime.UtcNow - maxTimeForData)).ToList();
             SetCurrentPrice(exchangeRates.Last().Price);
-            await HandleRedraw();
+            await HandleRedraw();            
+            StateHasChanged();
         }
     }
 
@@ -94,6 +95,10 @@
         //skept until the graph is create the first time
         if (exchangeRates is not null && isGraphDrawn)
         {
+            SetCurrentPrice(newRate.Price);
+            if (!isGraphDrawn)
+                await HandleRedraw();
+
             if (lineChart is not null)
             {
                 await lineChart.AddLabels(newRate.Time.ToLocalTime().ToString());
@@ -101,14 +106,13 @@
                 await lineChart.Update();
             }
             exchangeRates.Add(newRate);
-            SetCurrentPrice(newRate.Price);
+            StateHasChanged();
         }
     }
 
     void SetCurrentPrice(double price)
     {
         currentPrice = $"Current price: {price:0.##} €";
-        StateHasChanged();
     }
 
 
