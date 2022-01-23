@@ -21,12 +21,35 @@
 <p>The application retreives BTC to EUR price from <a href="https://api.coinbase.com">Coinbase public API</a>. A noise is added to the reteived value, 
     noise value can be at maximum @exchangeRateConfiguration.NoiseLevel% of the retreived value</p>
 <p>Values retrieve from the coin base api are stored in a in memory database when running on localhost or MsSql databbase for the Azure version using EF core</p>
+<div class="container">
+  <div class="row text-center">
+    <div class="col-3">
+      @if(exchangeRates is not null && exchangeRates.Last() is not null)
+            {
+                <h2>Currnent price: @exchangeRates.Last().Price.ToString("F2") €</h2>
+            }
+            else
+            {
+                <h2>Loading</h2>
+            }
+    </div>
+    <div class="col-3">
+      <button type="button" @onclick="() => SetTime(TimeSpan.FromHours(1))" class="btn btn-primary">1 Hour</button>
+    </div>
+    <div class="col-3">
+      <button type="button" @onclick="() => SetTime(TimeSpan.FromDays(1))" class="btn btn-primary">1 Day</button>
+    </div>
+    <div class="col-3">
+      <button type="button" @onclick="() => SetTime(TimeSpan.FromDays(5))" class="btn btn-primary">5 Days</button>
+    </div>
+  </div>
+</div>
 <LineChart @ref="lineChart" TItem="double" />
-
 @code{
     private HubConnection? hubConnection;
     LineChart<double>? lineChart;
     static private List<ExchangeRate>? exchangeRates;
+    static private bool isGraphDrawn = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,6 +70,7 @@
     {
         if ( firstRender )
         {
+            exchangeRates = new (await ExchangeRateService.GetExchangeRatesAsync(DateTime.UtcNow - maxTimeForData));
             await HandleRedraw();
         }
     }
@@ -56,17 +80,21 @@
         if (lineChart is not null)
         {
             await lineChart.Clear();
-            exchangeRates = new (await ExchangeRateService.GetExchangeRatesAsync());
             Labels = GetLabels();
             await lineChart.AddLabelsDatasetsAndUpdate(Labels, GetLineChartDataset());
+            isGraphDrawn = true;
         }
     }
 
+    IEnumerable<ExchangeRate> GetExchangeRatesFilterByTime()
+    {
+        return exchangeRates.Where(r => r.Time > DateTime.UtcNow - maxTimeForData);
+    }
     async Task AddRate(ExchangeRate newRate)
     {
         //exchangeRates is assigned when the graph is render the first time, here graph updates are 
         //skept until the graph is create the first time
-        if (exchangeRates is not null)
+        if (exchangeRates is not null && isGraphDrawn)
         {
             if (lineChart is not null)
             {
@@ -76,25 +104,28 @@
             }
             exchangeRates.Add(newRate);
         }
-
     }
 
     string[] GetLabels()
     {
         if(exchangeRates is not null)
-            return exchangeRates.Select(r => r.Time).ToList().ConvertAll(t => t.ToLocalTime().ToString()).ToArray();
+            return GetExchangeRatesFilterByTime()
+                            .Select(r => r.Time)
+                            .ToList().ConvertAll(t => t.ToLocalTime().ToString()).ToArray();
+
         return new string[0];
     }
 
     LineChartDataset<double> GetLineChartDataset()
     {
-        if (exchangeRates is not null)
+        if (exchangeRates is not null && exchangeRates.Count > 0)
         {
-            var firstValue = exchangeRates.First();
+            var exchangeRateToDisplay = GetExchangeRatesFilterByTime();
+            var firstValue = exchangeRateToDisplay.First();
             return new LineChartDataset<double>
             {
                 Label = $"{firstValue.BaseCurrency}-{firstValue.TargetCurrency} price",
-                Data = exchangeRates.Select(r => r.Price).ToList().ConvertAll(d => (double)d),
+                Data = exchangeRateToDisplay.Select(r => r.Price).ToList().ConvertAll(d => (double)d),
                 BackgroundColor = backgroundColors,
                 BorderColor = borderColors,
                 Fill = false,
@@ -105,6 +136,13 @@
 
         logger.LogError("{VariableName} was null", exchangeRates);
         return new LineChartDataset<double>();
+    }
+
+    TimeSpan maxTimeForData = TimeSpan.FromDays(5);
+    async void SetTime(TimeSpan timeForData)
+    {
+        maxTimeForData = timeForData;
+        await HandleRedraw();
     }
 
     string[] Labels = new string[0];

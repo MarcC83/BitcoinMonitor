@@ -1,6 +1,6 @@
 ﻿@page "/fetchdata"
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Bit coin monitor live tracker</PageTitle>
 
 @using BitcoinMonitor.Data
 @using BitcoinMonitor.Domain.Models
@@ -8,7 +8,7 @@
 
 <h1>Exchange rates</h1>
 
-<p>In table below are displayed all the exchange rates that are stored in the database</p>
+<p>In table below are displayed all the exchange rates that are stored in the database for the last 60 minutes</p>
 
 @if (rates == null)
 {
@@ -44,6 +44,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        rates = await ExchangeRateService.GetExchangeRatesAsync();
+        rates = await ExchangeRateService.GetExchangeRatesAsync(DateTime.Now - TimeSpan.FromMinutes(60));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BitcoinMonitor.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BitcoinMonitor.Data
 {
@@ -10,9 +11,16 @@ namespace BitcoinMonitor.Data
         {
             _context = context;
         }
-        public Task<ExchangeRate[]> GetExchangeRatesAsync()
+        async public Task<ExchangeRate[]> GetExchangeRatesAsync()
         {
-            return Task.Factory.StartNew(() => _context.ExchangeRates.ToArray());             
+            return await _context.ExchangeRates.ToArrayAsync();             
+        }
+
+        async public Task<ExchangeRate[]> GetExchangeRatesAsync(DateTime timeFrom)
+        {
+            return await _context.ExchangeRates
+                                    .Where(er => er.Time > timeFrom.ToUniversalTime())
+                                    .ToArrayAsync();
         }
     }
 }
