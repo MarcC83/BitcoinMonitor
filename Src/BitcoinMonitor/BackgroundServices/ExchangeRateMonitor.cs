@@ -38,7 +38,15 @@ namespace BitcoinMonitor.BackgroundServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _currentExchangeRate.OnNext(await GetExchangeRate());
+                try
+                {
+                    _currentExchangeRate.OnNext(await GetExchangeRate());
+                }
+                catch (Exception ex)
+                {
+                    //Catching the exception and logging it. Not further actions are taken at this point
+                    _logger.LogError(ex, "Exception in {MethodName}", nameof(ExecuteAsync));
+                }
                 await _periodicTimer.WaitForNextTickAsync(stoppingToken);
             }
         }

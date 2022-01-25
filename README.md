@@ -23,7 +23,7 @@ App will be accessible on localhost:80
 
 ### Using image from docker hub 
 Use the following command to pull the image from docker hub and run it  
-***docker run -p 80:80 marcclapera/bitcoinmonitor:0.7***
+***docker run -p 80:80 marcclapera/bitcoinmonitor:1.0.1***
 
 ## Test
 To run the unit test, use the command from the cloned repository root directory  

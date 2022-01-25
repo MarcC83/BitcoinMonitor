@@ -27,13 +27,13 @@
       @currentPrice
     </div>
     <div class="col-3">
+      <button type="button" @onclick="() => SetTime(TimeSpan.FromMinutes(30))" class="btn btn-primary">30 Minutes</button>
+    </div>
+    <div class="col-3">
       <button type="button" @onclick="() => SetTime(TimeSpan.FromHours(1))" class="btn btn-primary">1 Hour</button>
     </div>
     <div class="col-3">
-      <button type="button" @onclick="() => SetTime(TimeSpan.FromDays(1))" class="btn btn-primary">1 Day</button>
-    </div>
-    <div class="col-3">
-      <button type="button" @onclick="() => SetTime(TimeSpan.FromDays(5))" class="btn btn-primary">5 Days</button>
+      <button type="button" @onclick="() => SetTime(TimeSpan.FromHours(4))" class="btn btn-primary">4 Hours</button>
     </div>
   </div>
 </div>
@@ -148,7 +148,7 @@
         return new LineChartDataset<double>();
     }
 
-    TimeSpan maxTimeForData = TimeSpan.FromDays(5);
+    TimeSpan maxTimeForData = TimeSpan.FromHours(4);
     async void SetTime(TimeSpan timeForData)
     {
         maxTimeForData = timeForData;
